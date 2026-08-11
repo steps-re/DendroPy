@@ -444,8 +444,7 @@ class GenBankAccessionReference(object):
                 is_attribute=False,
                 annotate_as_reference=True,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
         for item in [
                 ("number", "INSDReference_reference"),
                 ("position", "INSDReference_position"),
@@ -467,8 +466,7 @@ class GenBankAccessionReference(object):
                 is_attribute=False,
                 annotate_as_reference=False,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
             top.annotations.add(sub)
         return top
 
@@ -509,8 +507,7 @@ class GenBankAccessionReferences(list):
                 is_attribute=False,
                 annotate_as_reference=True,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
         for reference in self:
             top.annotations.add(reference.as_annotation())
         return top
@@ -556,8 +553,7 @@ class GenBankAccessionQualifier(object):
             is_attribute=False,
             annotate_as_reference=False,
             is_hidden=False,
-            label=None,
-            oid=None)
+            label=None)
         return annote
 
 class GenBankAccessionQualifiers(list):
@@ -596,8 +592,7 @@ class GenBankAccessionQualifiers(list):
                 is_attribute=False,
                 annotate_as_reference=True,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
         for item in self:
             top.annotations.add(item.as_annotation())
         return top
@@ -618,7 +613,7 @@ class GenBankAccessionFeature(object):
         self.key = xml.findtext("INSDFeature_key")
         self.location = xml.findtext("INSDFeature_location")
         for intervals in xml.findall("INSDFeature_intervals"):
-            for interval_xml in xml.findall("INSDInterval"):
+            for interval_xml in intervals.findall("INSDInterval"):
                 interval = GenBankAccessionInterval(interval_xml)
                 self.intervals.append(interval)
         for qualifiers in xml.findall("INSDFeature_quals"):
@@ -637,8 +632,7 @@ class GenBankAccessionFeature(object):
                 is_attribute=False,
                 annotate_as_reference=True,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
         for item in [
                 ("key", "INSDFeature_key"),
                 ("location", "INSDFeature_location"),
@@ -656,8 +650,7 @@ class GenBankAccessionFeature(object):
                 is_attribute=False,
                 annotate_as_reference=False,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
             top.annotations.add(sub)
         if self.intervals:
             intervals_annote = dendropy.Annotation(
@@ -670,8 +663,7 @@ class GenBankAccessionFeature(object):
                 is_attribute=False,
                 annotate_as_reference=True,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
             top.annotations.add(intervals_annote)
             for interval in self.intervals:
                 interval_annote = dendropy.Annotation(
@@ -684,15 +676,14 @@ class GenBankAccessionFeature(object):
                     is_attribute=False,
                     annotate_as_reference=True,
                     is_hidden=False,
-                    label=None,
-                    oid=None)
+                    label=None)
                 intervals_annote.annotations.add(interval_annote)
                 for item in [
                         ("begin", "INSDInterval_from"),
                         ("end", "INSDInterval_to"),
                         ("accession", "INSDInterval_accession"),
                         ]:
-                    value = getattr(self, item[0])
+                    value = getattr(interval, item[0])
                     if not value:
                         continue
                     sub = dendropy.Annotation(
@@ -705,9 +696,8 @@ class GenBankAccessionFeature(object):
                         is_attribute=False,
                         annotate_as_reference=False,
                         is_hidden=False,
-                        label=None,
-                        oid=None)
-                    interval_annote.annotations.add(interval_annote)
+                        label=None)
+                    interval_annote.annotations.add(sub)
         if self.qualifiers:
             top.annotations.add(self.qualifiers.as_annotation())
         return top
@@ -748,8 +738,7 @@ class GenBankAccessionFeatures(list):
                 is_attribute=False,
                 annotate_as_reference=True,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
         for feature in self:
             top.annotations.add(feature.as_annotation())
         return top
@@ -770,8 +759,7 @@ class GenBankAccessionOtherSeqIds(dict):
                 is_attribute=False,
                 annotate_as_reference=True,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
         for key, value in self.items():
             sub = dendropy.Annotation(
                 name=key,
@@ -783,8 +771,7 @@ class GenBankAccessionOtherSeqIds(dict):
                 is_attribute=False,
                 annotate_as_reference=False,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
             top.annotations.add(sub)
         return top
 
@@ -935,8 +922,7 @@ class GenBankAccessionRecord(object):
                 is_attribute=False,
                 annotate_as_reference=True,
                 is_hidden=False,
-                label=None,
-                oid=None)
+                label=None)
         return annote
 
     def as_annotation(self):
@@ -1006,8 +992,9 @@ class GenBankAccessionRecord(object):
                     is_attribute=False,
                     annotate_as_reference=False,
                     is_hidden=False,
-                    label=None,
-                    oid=None)
+                    label=None)
+            else:
+                continue
             top.annotations.add(a)
         return top
 
