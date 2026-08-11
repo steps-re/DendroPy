@@ -165,6 +165,32 @@ class TestOrderedSetCollectionsManagement(unittest.TestCase):
             self.assertEqual(result, items)
         self.assertEqual(len(ordered_set), 0)
 
+    def test_setitem_basic_replacement(self):
+        ordered_set = container.OrderedSet([1, 2, 3])
+        ordered_set[1] = 20
+        self.assertEqual(list(ordered_set), [1, 20, 3])
+        self.assertIn(20, ordered_set)
+        self.assertNotIn(2, ordered_set)
+
+    def test_setitem_same_value_at_same_index_is_noop(self):
+        ordered_set = container.OrderedSet([1, 2, 3])
+        ordered_set[1] = 2
+        self.assertEqual(list(ordered_set), [1, 2, 3])
+
+    def test_setitem_duplicate_value_raises_and_preserves_state(self):
+        # Regression test: __setitem__() used to unconditionally write
+        # ``value`` into ``_item_list`` even when ``value`` already existed
+        # at a *different* index. Since ``_item_set`` is a set, adding an
+        # already-present value there is a no-op, so ``_item_list`` ended
+        # up with a duplicate entry while ``_item_set`` still reported only
+        # one occurrence -- the two internal structures went out of sync.
+        ordered_set = container.OrderedSet([1, 2, 3])
+        with self.assertRaises(ValueError):
+            ordered_set[0] = 3
+        # state must be unchanged after the rejected assignment
+        self.assertEqual(list(ordered_set), [1, 2, 3])
+        self.assertEqual(len(ordered_set._item_list), len(ordered_set._item_set))
+
 class TestOrderedSetDeepCopy(unittest.TestCase):
 
     def setUp(self):

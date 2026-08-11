@@ -85,6 +85,10 @@ class OrderedSet(object):
         Note takes *index* of than value as key.
         """
         item = self._item_list[index]
+        if value in self._item_set and value != item:
+            raise ValueError(
+                "Cannot set item at index {}: value {!r} already present "
+                "in set".format(index, value))
         self._item_set.remove(item)
         self._item_set.add(value)
         self._item_list[index] = value
@@ -311,7 +315,7 @@ class NormalizedBitmaskDict(collections.OrderedDict):
     def pop(self, key, alt_val=None):
         "a.pop(k[, x]):  a[k] if k in a, else x (and remove k)"
         key = self.normalize_key(key)
-        return dict.pop(self, key)
+        return dict.pop(self, key, alt_val)
 
     def get(self, key, def_val=None):
         "Gets an item by its key, returning default if key not present."

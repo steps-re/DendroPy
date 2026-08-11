@@ -67,5 +67,26 @@ class TestNormalizedBitmaskDict(unittest.TestCase):
         self.assertEqual(len(seen_keys_after_delete), len(splits) - 2)
         self.assertEqual(len(d), len(splits) - 2)
 
+class TestNormalizedBitmaskDictPop(unittest.TestCase):
+
+    def setUp(self):
+        self.fill_bitmask = 0xFF
+        self.d = container.NormalizedBitmaskDict(fill_bitmask=self.fill_bitmask)
+        self.d[0x03] = "present"
+
+    def test_pop_existing_key_removes_and_returns_value(self):
+        value = self.d.pop(0x03)
+        self.assertEqual(value, "present")
+        self.assertNotIn(0x03, self.d)
+
+    def test_pop_missing_key_returns_supplied_default(self):
+        # Regression test: pop(key, alt_val) used to ignore alt_val and call
+        # dict.pop(self, key) with no default, raising KeyError for a
+        # missing key even though a default was explicitly supplied (in
+        # violation of the method's own docstring).
+        sentinel = "my-default"
+        value = self.d.pop(0x99, sentinel)
+        self.assertIs(value, sentinel)
+
 if __name__ == "__main__":
     unittest.main()
